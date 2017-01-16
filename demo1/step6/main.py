@@ -3,7 +3,7 @@
 import pandas as pd
 
 from os.path import dirname, join
-DATA_DIR = './daily'
+DATA_DIR = join(dirname(__file__), '..', 'daily')
 
 def load_ticker(name):
     fname = join(DATA_DIR, "table_%s.csv" % name.lower())
@@ -12,8 +12,8 @@ def load_ticker(name):
     data = data.set_index('date')
     # For each tick symbol, compute the returns 
     return pd.DataFrame(
-            { name            : data.c, 
-              name+'_returns' : data.c.diff()/data.c })
+            {name: data.c,
+            name + '_returns': data.c.diff()/data.c })
 
 from bokeh.io import curdoc
 from bokeh.layouts import row, column
@@ -70,8 +70,8 @@ plot.select(BoxSelectTool).select_every_mousemove = False
 plot.select(LassoSelectTool).select_every_mousemove = False
 
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
-table_data = ColumnDataSource({"date":[], "ticker1":[], "ticker2":[], 
-                "t1_returns":[], "t2_returns":[]})
+table_data = ColumnDataSource({"date": [], "ticker1": [], "ticker2": [],
+                "t1_returns": [], "t2_returns": []})
 columns = [
         TableColumn(field="date", title="Date", formatter=DateFormatter()),
         TableColumn(field="ticker1", title="Stock1", width=100),

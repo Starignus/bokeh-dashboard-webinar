@@ -2,11 +2,16 @@
 
 execfile("step0.py")
 
+# How Bokeh interpret all goes in one single document (container)
 from bokeh.io import curdoc
 from bokeh.layouts import row, column
-from bokeh.models import ColumnDataSource 
+# Column data source to wrap our data
+from bokeh.models import ColumnDataSource
+# Select boxes for drop down menu (widget)
 from bokeh.models.widgets import Select
+# Defining the figure object
 from bokeh.plotting import figure
+
 
 def get_data(symbol1, symbol2):
     df1 = load_ticker(symbol1)
@@ -15,13 +20,16 @@ def get_data(symbol1, symbol2):
     data = data.dropna()
     data['ticker1'] = data[symbol1]
     data['ticker2'] = data[symbol2]
-    data['t1_returns'] = data[symbol1+'_returns']
-    data['t2_returns'] = data[symbol2+'_returns']
+    data['t1_returns'] = data[symbol1 + '_returns']
+    data['t2_returns'] = data[symbol2 + '_returns']
     return data
 
 datasource = ColumnDataSource(data=get_data("AAPL", "GOOG"))
 
 # Create the correlation plot
+# We add here some tools: box_select, lasso_select, tap. They will interact
+# with our datasource.on_change('selected', selection_change) at the end.
+# When these tools are activated, they set the 'selected' on the data source.
 plot = figure(title="Correlation Plot", plot_width=500, plot_height=500,
               tools="pan, wheel_zoom, box_select, lasso_select, tap, reset")
 plot.circle("t1_returns", "t2_returns", source=datasource)
@@ -55,16 +63,17 @@ def selection_change(attrname, old, new):
     selected = datasource.selected['1d']['indices']
     if selected:
         data = data.iloc[selected, :]
-
     if len(data) > 15:
-        text = str(data[[t1, t2, t1+'_returns', t2+'_returns']].describe())
+        text = str(data[[t1, t2, t1+'_returns', t2 + '_returns']].describe())
     else:
-        text = str(data[[t1, t2, t1+'_returns', t2+'_returns']])
+        text = str(data[[t1, t2, t1+'_returns', t2 + '_returns']])
     print text
 
 datasource.on_change('selected', selection_change)
 
 from bokeh.models import BoxSelectTool, LassoSelectTool
+# We turn off the default functionality that is send and update the server on every single
+# update change. We do not want that because we will have many events going on.
 plot.select(BoxSelectTool).select_every_mousemove = False
 plot.select(LassoSelectTool).select_every_mousemove = False
 

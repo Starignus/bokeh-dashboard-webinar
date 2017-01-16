@@ -2,11 +2,16 @@
 
 execfile("step0.py")
 
+# How Bokeh interpret all goes in one single document (container)
 from bokeh.io import curdoc
 from bokeh.layouts import row, column
-from bokeh.models import ColumnDataSource 
+# Column data source to wrap our data
+from bokeh.models import ColumnDataSource
+# Select boxes for drop down menu (widget)
 from bokeh.models.widgets import Select
+# Defining the figure object
 from bokeh.plotting import figure
+
 
 def get_data(symbol1, symbol2):
     df1 = load_ticker(symbol1)
@@ -59,9 +64,15 @@ plot.select(LassoSelectTool).select_every_mousemove = False
 
 #-------------------------------------------------------------------------
 
+# New data table in the bottom
 from bokeh.models.widgets import DataTable, DateFormatter, TableColumn
-table_data = ColumnDataSource({"date":[], "ticker1":[], "ticker2":[], 
-                "t1_returns":[], "t2_returns":[]})
+
+# Data source for the table that contains a subset of values from the ones that
+# are plotted.
+table_data = ColumnDataSource({"date": [], "ticker1": [], "ticker2": [],
+                "t1_returns": [], "t2_returns": []})
+
+# We define the column's format in the table
 columns = [
         TableColumn(field="date", title="Date", formatter=DateFormatter()),
         TableColumn(field="ticker1", title="Stock1", width=100),
@@ -69,8 +80,12 @@ columns = [
         TableColumn(field="t1_returns", title="Stock1 Returns"),
         TableColumn(field="t2_returns", title="Stock2 Returns")]
 
+# Creating DataTable
 table = DataTable(source=table_data, columns=columns, width=800)
 
+# Define the layout (creating a column with the boxes, and then a row
+# between the column and the plot, and then a column containing the
+# table and the row we defined before.
 layout = column(
             row(column(ticker1, ticker2), plot),
             table)
